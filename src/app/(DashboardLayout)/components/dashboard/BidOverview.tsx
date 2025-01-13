@@ -3,21 +3,23 @@ import { Select, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import dynamic from "next/dynamic";
+import axios from 'axios';
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-const SalesOverview = () => {
-
+const SalesOverview = ({todayCount}: {todayCount: number}) => {
     // chart color
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     const secondary = theme.palette.secondary.main;
 
+    const monthIndex = new Date().getMonth() + 1;
+
     // select
-    const [month, setMonth] = React.useState<number>(1)
+    const [month, setMonth] = useState<number>(monthIndex)
     const [seriesChat, setSeriesChat] = useState<any>({
-        name: 'Eanings this month',
+        name: 'Earnings this month',
         data: [],
     })
     const [optionsChat, setOptionsChat] = useState<any>({
@@ -56,7 +58,7 @@ const SalesOverview = () => {
         },
         grid: {
             borderColor: 'rgba(0,0,0,0.1)',
-            strokeDashArray: 3,
+            strokeDashArray: 7,
             xaxis: {
                 lines: {
                     show: false,
@@ -64,7 +66,7 @@ const SalesOverview = () => {
             },
         },
         yaxis: {
-            tickAmount: 4,
+            tickAmount: 10,
         },
         xaxis: {
             categories: [],
@@ -79,34 +81,46 @@ const SalesOverview = () => {
     })
     
     useEffect(() => {
-        const newOption = []
-        const newSeries = []
+        const newOption = [];
+        const newSeries = [];
+        const userId = 'lucas0524';
+
         for(let i = 0; i < days[month - 1]; i ++) {
             newOption.push(`${month}/${i + 1}`)
-            const ran_number = Math.random() * 500
-            newSeries.push(ran_number.toFixed(0))
+            newSeries.push(0)
         }
+
+        const fetchAPI = async () => {
+            const res = await axios.get(`http://localhost:3001/bidInfo?userId=${userId}&month=${month}`);
+
+            for (let i = 0; i < res.data.length; i++) {
+                const date = res.data[i].date;
+                newSeries[date - 1] = res.data[i].count;
+            }
+        }
+
+        fetchAPI();
 
         setOptionsChat({optionsChat,
             xaxis: {
                 categories: newOption
             }
         })
-        setSeriesChat({seriesChat,
+        console.log('!!!', {...seriesChat,
+            data: newSeries
+        });
+        setSeriesChat({...seriesChat,
             data: newSeries
         })
-    }, [ month ])
+    }, [ month, todayCount ])
+
+    useEffect(() => {
+        console.log('<><><>', seriesChat);
+    }, [seriesChat])
 
     const handleChange = (event: any) => {
         setMonth(event.target.value);
     };
-
-    const seriescolumnchart: any = [
-        {
-            name: 'Eanings this month',
-            data: [355, 390, 300, 350, 390, 180, 355, 390, 355, 390, 300, 350, 390, 180, 355, 390, 355, 390, 300, 350, 390, 180, 355, 390],
-        },
-    ];
 
     return (
 
@@ -132,12 +146,15 @@ const SalesOverview = () => {
                 <MenuItem value={12}>Dec 2025</MenuItem>
             </Select>
         }>
-            <Chart
-                options={optionsChat}
-                series={[seriesChat]}
-                type="area"
-                height={370} width={"100%"}
-            />
+            <div>
+                <Chart
+                    options={optionsChat}
+                    series={[seriesChat]}
+                    type="area"
+                    height={370} width={"100%"}
+                />
+                {JSON.stringify(seriesChat)}
+            </div>
         </DashboardCard>
     );
 };

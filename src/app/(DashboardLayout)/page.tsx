@@ -2,28 +2,34 @@
 import { Grid, Box } from '@mui/material';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 // components
-import SalesOverview from '@/app/(DashboardLayout)/components/dashboard/BidOverview';
-import YearlyBreakup from '@/app/(DashboardLayout)/components/dashboard/WeeklyInfo';
+import BidOverview from '@/app/(DashboardLayout)/components/dashboard/BidOverview';
+import WeeklyInfo from '@/app/(DashboardLayout)/components/dashboard/WeeklyInfo';
 import RecentTransactions from '@/app/(DashboardLayout)/components/dashboard/RecentTransactions';
 import ProductPerformance from '@/app/(DashboardLayout)/components/dashboard/ProductPerformance';
 import Blog from '@/app/(DashboardLayout)/components/dashboard/Blog';
-import MonthlyEarnings from '@/app/(DashboardLayout)/components/dashboard/TodayInfo';
+import TodayInfo from '@/app/(DashboardLayout)/components/dashboard/TodayInfo';
+import { useState, useEffect } from 'react';
 
 const Dashboard = () => {
+  const [ todayCount, setTodayCount ] = useState<number>(0);
+  useEffect(() => {
+
+  }, [ TodayInfo ]);
+
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
       <Box>
         <Grid container spacing={3}>
           <Grid item xs={12} lg={8}>
-            <SalesOverview />
+            <BidOverview todayCount={todayCount}/>
           </Grid>
           <Grid item xs={12} lg={4}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <YearlyBreakup />
+                <WeeklyInfo />
               </Grid>
               <Grid item xs={12}>
-                <MonthlyEarnings />
+                <TodayInfo todayCount={todayCount} setTodayCount={setTodayCount}/>
               </Grid>
             </Grid>
           </Grid>

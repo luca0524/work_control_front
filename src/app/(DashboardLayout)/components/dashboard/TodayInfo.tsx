@@ -5,26 +5,55 @@ import { useTheme } from '@mui/material/styles';
 import { Stack, Typography, Avatar, Fab, Button } from '@mui/material';
 import { IconArrowDownRight, IconCurrencyDollar } from '@tabler/icons-react';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from 'axios';
+import { Props } from "react-apexcharts";
 
-const TodayInfo = () => {
+interface TodayInfoPropsType {
+  todayCount: number;
+  setTodayCount: (todayCount: number) => void;
+}
+
+const TodayInfo = ({todayCount, setTodayCount}: TodayInfoPropsType) => {
   // chart color
   const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-  const secondarylight = '#f5fcff';
   const errorlight = '#fdede8';
 
-  //
-  const [ todayCount, setTodayCount ] = useState(0)
+  useEffect(() => {
+    const fetchAPI = async () => {
+
+      const userId = 'lucas0524';
+      //console.log(`http://localhost:3001/bidInfo?userId=${userId}`);
+      const res = await axios.get(`http://localhost:3001/bidInfo?userId=${userId}`);
+
+      if (res.data.length > 0) {
+        setTodayCount(res.data[0].count);
+      } else {
+        setTodayCount(0);
+      }
+      //console.log(res.data);
+    }
+
+    fetchAPI();
+  }, [ ])
 
   const handleCount = async () => {
     setTodayCount(todayCount + 1);
-    const res = await axios.post("http://localhost:8080/bidCount", {
-      first_name : "lucas",
-      last_name : "morgan",
-      bid_count : todayCount + 1
-    });
+    if(todayCount == 0) {
+      const res = await axios.post("http://localhost:3001/bidInfo", {
+        userId: 'lucas0524',
+        count: 1
+      });
+
+      //console.log(res);
+    } else if (todayCount > 0) {
+      const res = await axios.put("http://localhost:3001/bidInfo", {
+        userId: 'lucas0524',
+        count: todayCount + 1
+      });
+
+      //console.log(res);
+    }
   }
 
   return (
