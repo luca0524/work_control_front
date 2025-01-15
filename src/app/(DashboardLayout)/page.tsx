@@ -9,12 +9,49 @@ import ProductPerformance from '@/app/(DashboardLayout)/components/dashboard/Pro
 import Blog from '@/app/(DashboardLayout)/components/dashboard/Blog';
 import TodayInfo from '@/app/(DashboardLayout)/components/dashboard/TodayInfo';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Dashboard = () => {
-  const [ todayCount, setTodayCount ] = useState<number>(0);
-  useEffect(() => {
 
-  }, [ TodayInfo ]);
+  const standard = 120;
+  const [standardUpdown, setStandardUpDown] = useState<boolean>(false); // Up: true, Down: false
+  const [standardPercent, setStandardPercent] = useState<number>(0); 
+
+  const [ todayCount, setTodayCount ] = useState<number>(0);
+
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchAPI = async () => {
+      setLoading(true);
+      try{
+        const userId = 'lucas0524';
+        const resToday = await axios.get(`http://localhost:3001/bidInfo/todayInfo?userId=${userId}`);
+ 
+        if (resToday.data.length > 0) {
+          setTodayCount(resToday.data[0].count);
+        } 
+      } catch (error) {
+        console.error("error occur");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAPI();
+  }, []);
+
+  useEffect(() => {
+    // Standard Part
+    setStandardPercent(Math.floor(Math.abs(todayCount - standard) * 100 / standard));    
+    if (standard < todayCount) {
+      setStandardUpDown(true);
+    } else {
+      setStandardUpDown(false);
+    }
+    //console.log('Today count has changed:', todayCount);
+  }, [todayCount]); 
 
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
@@ -26,10 +63,18 @@ const Dashboard = () => {
           <Grid item xs={12} lg={4}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <WeeklyInfo />
+                <WeeklyInfo todayCount={todayCount} />
               </Grid>
               <Grid item xs={12}>
-                <TodayInfo todayCount={todayCount} setTodayCount={setTodayCount}/>
+                <TodayInfo 
+                  standardInfo={
+                    {count: standard,
+                    dir: standardUpdown,
+                    percent: standardPercent
+                  }} 
+                  todayCount={todayCount} 
+                  setTodayCount={setTodayCount}
+                />
               </Grid>
             </Grid>
           </Grid>
