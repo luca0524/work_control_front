@@ -13,7 +13,7 @@ import axios from 'axios';
 
 const Dashboard = () => {
 
-  const standard = 120;
+  const standard = 160;
   const [standardUpdown, setStandardUpDown] = useState<boolean>(false); // Up: true, Down: false
   const [standardPercent, setStandardPercent] = useState<number>(0); 
 

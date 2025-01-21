@@ -13,13 +13,15 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
   // chart color
   const theme = useTheme();
   const primary = theme.palette.primary.main;
-  const primarylight = '#ecf2ff';
+  const warning = theme.palette.warning.main;
   const successlight = theme.palette.success.light;
 
   const [lastWeekCount, setLastWeekCount] = useState<number>(0);
   const [thisWeekCount, setThisWeekCount] = useState<number>(0);
   const [weekDir, setWeekDri] = useState<boolean>(false);
   const [weekPercent, setWeekPercent] = useState<number>(0);
+
+  const [seriescolumnchart, setSeriesColumnChart] = useState<any>([38, 40]);
 
   // chart
   const optionscolumnchart: any = {
@@ -32,7 +34,7 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
       },
       height: 155,
     },
-    colors: [primary, primarylight, '#F9F9FD'],
+    colors: [primary, warning],
     plotOptions: {
       pie: {
         startAngle: 0,
@@ -67,12 +69,16 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
       },
     ],
   };
-  const seriescolumnchart: any = [38, 40, 25];
+  
 
   useEffect(() => {
     const fetchAPI = async () => {
       const userId = 'lucas0524';
-      
+      let weekCountInfo = {
+        thisCount: thisWeekCount,
+        lastCount: lastWeekCount
+      };
+
       const resWeek = await axios.get(`http://localhost:3001/bidInfo/lastWeek?userId=${userId}`);
 
       if (resWeek.data.length > 0) {
@@ -81,6 +87,7 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
           lastCount += resWeek.data[i].count;
         }
         setLastWeekCount(lastCount);
+        weekCountInfo.lastCount = lastCount;
       } 
 
       const res = await axios.get(`http://localhost:3001/bidInfo/thisWeek?userId=${userId}`);
@@ -91,14 +98,12 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
           thisCount += res.data[i].count;
         }
         setThisWeekCount(thisCount);
+        weekCountInfo.thisCount = thisCount;
       } 
 
-      let lcount = 1;
-      if (lastWeekCount != 0) {
-        lcount = lastWeekCount;
-      }
-      setWeekPercent(Math.floor(Math.abs(thisWeekCount - lcount) * 100 / lcount));    
-      if (lcount < thisWeekCount) {
+      setSeriesColumnChart([weekCountInfo.thisCount, weekCountInfo.lastCount]);
+      setWeekPercent(Math.floor(Math.abs(weekCountInfo.thisCount - weekCountInfo.lastCount) * 100 / weekCountInfo.lastCount));    
+      if (weekCountInfo.lastCount < weekCountInfo.thisCount) {
         setWeekDri(true);
       } else {
         setWeekDri(false);
@@ -124,12 +129,14 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
               {weekDir? '+' : '-'}{weekPercent}%
             </Typography>
           </Stack>
-          <Typography variant="subtitle2" color="textSecondary">
-              last week
+          <Stack direction="row" spacing={1} mt={1} alignItems="center">
+            <Typography variant="h5" color="textSecondary">
+                last week
             </Typography>
-          <Typography variant="h4" fontWeight="700">
-            {lastWeekCount}
-          </Typography>
+            <Typography variant="h4" fontWeight="700">
+              {lastWeekCount}
+            </Typography>
+          </Stack>
         </Grid>
         {/* column */}
         <Grid item xs={5} sm={5}>

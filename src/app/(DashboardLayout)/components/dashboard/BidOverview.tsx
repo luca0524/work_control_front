@@ -3,6 +3,7 @@ import { Select, MenuItem } from '@mui/material';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import dynamic from "next/dynamic";
 import axios from 'axios';
+import { ApexOptions } from 'apexcharts';
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -11,38 +12,48 @@ const BidOverview = ({todayCount}: {todayCount: number}) => {
     const monthIndex = new Date().getMonth() + 1;
 
     const [month, setMonth] = useState<number>(monthIndex);
-    const [chartInfo, setChartInfo] = useState({
-        series: [{
-            name: "This Day's Bid Count",
-            data: []
-        }],
-        options: {
-            chart: {
-                type: 'line',
-                fontFamily: "'Plus Jakarta Sans', sans-serif;",
-                foreColor: '#adb0bb',
-                zoom: {
-                    enabled: false
-                },
-                height: 350,
+
+    const [chartOptions, setChartOptions] = useState<ApexOptions>({
+        chart: {
+            type: 'line',
+            fontFamily: "'Plus Jakarta Sans', sans-serif;",
+            foreColor: '#adb0bb',
+            zoom: {
+                enabled: false
             },
-            dataLabels: {
-                enabled: false,
+            height: 350,
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        stroke: {
+            curve: 'smooth'
+        },
+        grid: {
+            row: {
+                colors: ['#f3f3f3', 'transparent'],
+                opacity: 0.5
             },
-            stroke: {
-                curve: 'straight'
-            },
-            grid: {
-                row: {
-                    colors: ['#f3f3f3', 'transparent'],
-                    opacity: 0.5
-                },
-            },
-            xaxis: {
-                categories: [],
-            },
-        }
+        },
+        xaxis: {
+            categories: ['1', '2', '3'],
+        },
+        legend:{
+            position: 'top',
+            horizontalAlign: 'right',
+            floating: true,
+            offsetX: -25,
+            offsetY: -5
+        },
+        colors: ['#77B6EA']
     });
+
+    const [chartSeries, setChartSeries] = useState([
+        {
+            name: "Bid Count",
+            data: [0, 0, 0]
+        },
+    ]);
 
     const [loading, setLoading] = useState<boolean>(false);
     
@@ -56,6 +67,13 @@ const BidOverview = ({todayCount}: {todayCount: number}) => {
             newSeries.push(0)
         }
 
+        setChartOptions({
+            ...chartOptions,
+            xaxis: {
+                categories: newOption
+            }
+        })
+
         const fetchAPI = async () => {
             setLoading(true);
             try {
@@ -65,38 +83,12 @@ const BidOverview = ({todayCount}: {todayCount: number}) => {
                     newSeries[date - 1] = res.data[i].count;
                 }
         
-                setChartInfo({
-                    series: [{
-                        name: "This Day's Bid Count",
+                setChartSeries([
+                    {
+                        name: "Bid Count",
                         data: newSeries
-                    }],
-                    options: {
-                        chart: {
-                            type: 'line',
-                            fontFamily: "'Plus Jakarta Sans', sans-serif;",
-                            foreColor: '#adb0bb',
-                            zoom: {
-                                enabled: false
-                            },
-                            height: 350,
-                        },
-                        dataLabels: {
-                            enabled: false,
-                        },
-                        stroke: {
-                            curve: 'straight'
-                        },
-                        grid: {
-                            row: {
-                                colors: ['#f3f3f3', 'transparent'],
-                                opacity: 0.5
-                            },
-                        },
-                        xaxis: {
-                            categories: newOption,
-                        },
                     }
-                });
+                ])
             } catch (error) {
                 console.error("Error fetching month data:", error);
             } finally {
@@ -138,8 +130,8 @@ const BidOverview = ({todayCount}: {todayCount: number}) => {
             }>
             <div>
                 <Chart
-                    options={chartInfo.options}
-                    series={chartInfo.series}
+                    options={chartOptions}
+                    series={chartSeries}
                     type="line"
                     height={370} width={"100%"}
                 />
