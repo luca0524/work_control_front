@@ -4,9 +4,25 @@ import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 // components
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
+import axios from 'axios';
 import AuthLogin from "../auth/AuthLogin";
+import {useDispatch, useSelector} from "react-redux";
+import {login} from "@/slices/authSlice";
+import { RootState } from "@/store/store";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Login2 = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const {loading, error, isAuthenticated} = useSelector((state : RootState) => state.auth);
+  const handleLogin = async (login_data:any) => {
+    dispatch(login(login_data) as any)
+  }
+  useEffect(() => {
+    if(isAuthenticated) router.push("/")
+    else if(error) alert(error)
+  }, [isAuthenticated, error])
   return (
     <PageContainer title="Login" description="this is Login page">
       <Box
@@ -47,7 +63,7 @@ const Login2 = () => {
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Logo />
               </Box>
-              <AuthLogin
+              <AuthLogin handleLogin={handleLogin}
                 subtext={
                   <Typography
                     variant="subtitle1"

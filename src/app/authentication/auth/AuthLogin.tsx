@@ -16,10 +16,13 @@ interface loginType {
   title?: string;
   subtitle?: JSX.Element | JSX.Element[];
   subtext?: JSX.Element | JSX.Element[];
+  handleLogin ?: (login_data:any ) => void
 }
 
-const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
-  <>
+const AuthLogin = ({ title, subtitle, subtext, handleLogin }: loginType) => {
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  return (<>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
         {title}
@@ -39,7 +42,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         >
           Username
         </Typography>
-        <CustomTextField variant="outlined" fullWidth />
+        <CustomTextField variant="outlined" fullWidth onChange={(e) => setUsername(e.target.value)} />
       </Box>
       <Box mt="25px">
         <Typography
@@ -51,7 +54,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         >
           Password
         </Typography>
-        <CustomTextField type="password" variant="outlined" fullWidth />
+        <CustomTextField type="password" variant="outlined" fullWidth onChange={(e) => setPassword(e.target.value)}/>
       </Box>
       <Stack
         justifyContent="space-between"
@@ -79,20 +82,18 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
       </Stack>
     </Stack>
     <Box>
-      <Button
+      {handleLogin && <Button
         color="primary"
         variant="contained"
         size="large"
         fullWidth
-        component={Link}
-        href="/"
-        type="submit"
+        onClick={() => handleLogin({username, password})}
       >
         Sign In
-      </Button>
+      </Button>}
     </Box>
     {subtitle}
-  </>
-);
+  </>)
+}
 
 export default AuthLogin;

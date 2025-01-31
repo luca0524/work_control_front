@@ -4,8 +4,20 @@ import Link from "next/link";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import AuthRegister from "../auth/AuthRegister";
+import axios from 'axios';
 
-const Register2 = () => (
+const Register2 = () => {
+  const handleSignUp = async (userdata:any) => {
+    const res = await axios.post("http://localhost:3001/auth/register", userdata);
+    if(res.data.success == true){
+      alert("Registered Successfully!");
+    }
+    else {
+      alert(res.data.message);
+    }
+  }
+  
+  return (
   <PageContainer title="Register" description="this is Register page">
     <Box
       sx={{
@@ -45,7 +57,7 @@ const Register2 = () => (
             <Box display="flex" alignItems="center" justifyContent="center">
               <Logo />
             </Box>
-            <AuthRegister
+            <AuthRegister onSignUp={handleSignUp}
               subtext={
                 <Typography
                   variant="subtitle1"
@@ -89,6 +101,6 @@ const Register2 = () => (
       </Grid>
     </Box>
   </PageContainer>
-);
+)};
 
 export default Register2;

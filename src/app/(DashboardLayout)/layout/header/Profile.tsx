@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
+import { useDispatch } from "react-redux";
+import {logout} from "@/slices/authSlice";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
@@ -21,7 +23,7 @@ const Profile = () => {
   const handleClose2 = () => {
     setAnchorEl2(null);
   };
-
+  const dispatch = useDispatch();
   return (
     <Box>
       <IconButton
@@ -83,11 +85,10 @@ const Profile = () => {
         </MenuItem>
         <Box mt={1} py={1} px={2}>
           <Button
-            href="/authentication/login"
             variant="outlined"
             color="primary"
-            component={Link}
             fullWidth
+            onClick = {() => dispatch(logout())}
           >
             Logout
           </Button>

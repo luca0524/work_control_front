@@ -1,9 +1,13 @@
 "use client";
 import { styled, Container, Box } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/app/(DashboardLayout)/layout/header/Header";
 import Sidebar from "@/app/(DashboardLayout)/layout/sidebar/Sidebar";
-
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { fetchProfile } from "@/slices/authSlice";
+import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -31,6 +35,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
+
+  useEffect(() => {
+    if(isAuthenticated)
+      dispatch(fetchProfile() as any)
+    else router.push("authentication/login")
+  }, [isAuthenticated, dispatch])
+
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   return (
