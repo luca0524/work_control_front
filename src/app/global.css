@@ -1,0 +1,18 @@
+.custom-grid {
+    background-color: #fafafa;
+    border-radius: 10px;
+  }
+  
+  .custom-grid .MuiDataGrid-columnHeaders {
+    background-color: #1976d2;
+    color: white;
+  }
+  
+  .custom-grid .MuiDataGrid-cell {
+    font-weight: bold;
+  }
+  
+  .custom-grid .MuiDataGrid-row:nth-child(even) {
+    background-color: #f5f5f5;
+  }
+  

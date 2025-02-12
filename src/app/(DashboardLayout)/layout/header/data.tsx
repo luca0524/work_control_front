@@ -1,3 +1,4 @@
+"use client";
 
 import img1 from 'src/assets/images/profile/user-1.jpg';
 import img2 from 'src/assets/images/profile/user-2.jpg';

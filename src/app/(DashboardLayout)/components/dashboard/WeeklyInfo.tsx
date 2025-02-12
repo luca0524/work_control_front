@@ -1,4 +1,4 @@
-
+"use client";
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { useTheme } from '@mui/material/styles';
@@ -8,6 +8,8 @@ import { IconArrowUpLeft } from '@tabler/icons-react';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";  
+import { RootState } from "@/store/store";
 
 const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
   // chart color
@@ -22,6 +24,7 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
   const [weekPercent, setWeekPercent] = useState<number>(0);
 
   const [seriescolumnchart, setSeriesColumnChart] = useState<any>([38, 40]);
+  const {user} = useSelector((state : RootState) => state.auth);
 
   // chart
   const optionscolumnchart: any = {
@@ -73,13 +76,12 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
 
   useEffect(() => {
     const fetchAPI = async () => {
-      const userId = 'lucas0524';
       let weekCountInfo = {
         thisCount: thisWeekCount,
         lastCount: lastWeekCount
       };
 
-      const resWeek = await axios.get(`http://localhost:3001/bidInfo/lastWeek?userId=${userId}`);
+      const resWeek = await axios.get(`http://localhost:3001/bidInfo/lastWeek/?userId=${user?.id}`);
 
       if (resWeek.data.length > 0) {
         let lastCount = 0;
@@ -90,7 +92,7 @@ const WeeklyInfo = ({todayCount}: {todayCount: number}) => {
         weekCountInfo.lastCount = lastCount;
       } 
 
-      const res = await axios.get(`http://localhost:3001/bidInfo/thisWeek?userId=${userId}`);
+      const res = await axios.get(`http://localhost:3001/bidInfo/thisWeek/?userId=${user?.id}`);
 
       if (res.data.length > 0) {
         let thisCount = 0;

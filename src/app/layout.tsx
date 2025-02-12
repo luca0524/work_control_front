@@ -15,6 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script src="http://localhost:8097"></script>
+      </head>
       <body>
         <Provider store={store}>
           <ThemeProvider theme={baselightTheme}>

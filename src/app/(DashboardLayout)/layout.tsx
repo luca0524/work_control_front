@@ -36,14 +36,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth)  || { user: null };
   const router = useRouter();
 
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
-    if(isAuthenticated)
-      dispatch(fetchProfile() as any)
-    else router.push("authentication/login")
-  }, [isAuthenticated, dispatch])
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    if (isAuthenticated) dispatch(fetchProfile() as any);
+    else router.push("authentication/login");
+  }, [isAuthenticated, dispatch, mounted]);
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);

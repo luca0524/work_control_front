@@ -1,9 +1,13 @@
+"use client";
 import React, { useEffect, useState } from 'react';
 import { Select, MenuItem } from '@mui/material';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import dynamic from "next/dynamic";
 import axios from 'axios';
 import { ApexOptions } from 'apexcharts';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -56,12 +60,11 @@ const BidOverview = ({todayCount}: {todayCount: number}) => {
     ]);
 
     const [loading, setLoading] = useState<boolean>(false);
+    const { user } = useSelector((state : RootState) => state.auth);
     
     useEffect(() => {
         const newOption: string[] = [];
         const newSeries: number[] = [];
-        const userId = 'lucas0524';
-
         for(let i = 0; i < days[month - 1]; i ++) {
             newOption.push(`${i + 1}`)
             newSeries.push(0)
@@ -77,7 +80,7 @@ const BidOverview = ({todayCount}: {todayCount: number}) => {
         const fetchAPI = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`http://localhost:3001/bidInfo?userId=${userId}&month=${month}`);
+                const res = await axios.get(`http://localhost:3001/bidInfo/?userId=${user?.id}&month=${month}`);
                 for (let i = 0; i < res.data.length; i++) {
                     const date = res.data[i].date;
                     newSeries[date - 1] = res.data[i].count;

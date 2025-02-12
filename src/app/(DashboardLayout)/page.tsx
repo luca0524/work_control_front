@@ -8,17 +8,18 @@ import RecentTransactions from '@/app/(DashboardLayout)/components/dashboard/Rec
 import ProductPerformance from '@/app/(DashboardLayout)/components/dashboard/ProductPerformance';
 import Blog from '@/app/(DashboardLayout)/components/dashboard/Blog';
 import TodayInfo from '@/app/(DashboardLayout)/components/dashboard/TodayInfo';
-import { useState, useEffect } from 'react';
+import { useState, useEffect , useMemo} from 'react';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 const Dashboard = () => {
 
   const standard = 160;
   const [standardUpdown, setStandardUpDown] = useState<boolean>(false); // Up: true, Down: false
-  const [standardPercent, setStandardPercent] = useState<number>(0); 
 
   const [ todayCount, setTodayCount ] = useState<number>(0);
-
+  const {user} = useSelector((state : RootState) => state.auth);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -26,8 +27,7 @@ const Dashboard = () => {
     const fetchAPI = async () => {
       setLoading(true);
       try{
-        const userId = 'lucas0524';
-        const resToday = await axios.get(`http://localhost:3001/bidInfo/todayInfo?userId=${userId}`);
+        const resToday = await axios.get(`http://localhost:3001/bidInfo/todayInfo/?userId=${user?.id}`);
  
         if (resToday.data.length > 0) {
           setTodayCount(resToday.data[0].count);
@@ -38,13 +38,14 @@ const Dashboard = () => {
         setLoading(false);
       }
     }
-
     fetchAPI();
   }, []);
-
+  const standardPercent = useMemo(() => 
+    Math.floor(Math.abs(todayCount - standard) * 100 / standard), 
+    [todayCount, standard]
+  );
   useEffect(() => {
     // Standard Part
-    setStandardPercent(Math.floor(Math.abs(todayCount - standard) * 100 / standard));    
     if (standard < todayCount) {
       setStandardUpDown(true);
     } else {

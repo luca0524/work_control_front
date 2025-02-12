@@ -1,10 +1,13 @@
-
+"use client"; 
 import { Stack, Typography, Avatar, Fab, Button } from '@mui/material';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import { useState, useEffect } from "react";
 import axios from 'axios';
 import { useTheme } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { getCookie } from '@/services/api';
 
 interface TodayInfoProps {
   standardInfo: {
@@ -24,12 +27,12 @@ const TodayInfo = ({ standardInfo, todayCount, setTodayCount }: TodayInfoProps) 
   const [ lastCount, setLastCount ] = useState<number>(0);
   const [ lastDir, setLastDir ] = useState<boolean>(false);
   const [ lastPercent, setLastPercent ] = useState<number>(0);
-  
+  const {user} = useSelector((state : RootState) => state.auth);
+
   useEffect(() => {
     const fetchAPI = async () => {
-      const userId = 'lucas0524';
       
-      const resLast = await axios.get(`http://localhost:3001/bidInfo/lastInfo?userId=${userId}`);
+      const resLast = await axios.get(`http://localhost:3001/bidInfo/lastInfo/?userId=${user?.id}`);
 
       if (resLast.data.length > 0) {
         setLastCount(resLast.data[0].count);
@@ -40,7 +43,7 @@ const TodayInfo = ({ standardInfo, todayCount, setTodayCount }: TodayInfoProps) 
   }, [setTodayCount]);
 
   useEffect(() => {
-    setLastPercent(Math.floor(Math.abs(todayCount - lastCount) * 100 / lastCount));    
+    setLastPercent(lastCount ? Math.floor(Math.abs(todayCount - lastCount) * 100 / lastCount) : 0);    
     if (lastCount < todayCount) {
       setLastDir(true);
     } else {
@@ -52,8 +55,8 @@ const TodayInfo = ({ standardInfo, todayCount, setTodayCount }: TodayInfoProps) 
     const newCount = todayCount + 1;
     setTodayCount(todayCount + 1);
 
-    await axios.put("http://localhost:3001/bidInfo", {
-      userId: 'lucas0524',
+    await axios.post("http://localhost:3001/bidInfo/update/", {
+      userId: user?.id,
       count: newCount
     });
   }

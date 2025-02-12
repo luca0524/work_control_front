@@ -8,12 +8,12 @@ import axios from 'axios';
 
 const Register2 = () => {
   const handleSignUp = async (userdata:any) => {
-    const res = await axios.post("http://localhost:3001/auth/register", userdata);
-    if(res.data.success == true){
-      alert("Registered Successfully!");
+    try {
+      const res = await axios.post("http://localhost:3001/auth/register/", userdata);
+      alert("Registration successful!");
     }
-    else {
-      alert(res.data.message);
+    catch (error : any) {
+      alert("Error: " + error.response.data.error);
     }
   }
   

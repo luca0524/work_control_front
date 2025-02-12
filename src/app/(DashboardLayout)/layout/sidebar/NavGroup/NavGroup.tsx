@@ -1,3 +1,4 @@
+"use client";
 import PropTypes from 'prop-types';
 // mui imports
 import { ListSubheader, styled, Theme } from '@mui/material';
